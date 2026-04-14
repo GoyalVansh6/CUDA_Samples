@@ -1,9 +1,9 @@
 #include <iostream>
-#include "kernel1.cu"
+#include "kernel2.cu"
 #include "../CPU/prefix_sum.cpp"
 
 int main(){
-    int size = 1000;
+    int size = 1000000;
     float* h_m = new float[size];
     float* h_n = new float[size];
 
@@ -26,10 +26,6 @@ int main(){
             break;
         }
     }
-
-    // if(correct){
-        // std::cout << "Correct" << std::endl;
-    // }
 
     delete[] h_m;
     delete[] h_n;

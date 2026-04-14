@@ -4,13 +4,7 @@ __global__ void prefix_sum_kernel(float* m, int size){
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
     int stride = 1;
 
-    for(int i = 0; i < log2(size); i++){
-        if(idx >= stride){
-            m[idx] += m[idx - stride];
-        }
-        stride *= 2;
-        __syncthreads();
-    }
+        
 }
 
 void prefix_sum(float* m, float* n, int size){

@@ -5,8 +5,7 @@ __global__ void scan_block_with_sums(float* m, float* sums, int size){
     if (idx >= size) return;
 
     int block_size = blockDim.x;
-    int log_size = 0;
-    while ((1 << log_size) < block_size) log_size++;
+    int log_size = log2(2 * block_size - 1);
 
     for(int i = 0; i < log_size; i++){
         float val = 0;
@@ -25,11 +24,10 @@ __global__ void scan_block_with_sums(float* m, float* sums, int size){
 }
 
 __global__ void simple_scan(float* m, int size){
-    int idx = threadIdx.x;
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
     if (idx >= size) return;
 
-    int log_size = 0;
-    while ((1 << log_size) < size) log_size++;
+    int log_size = log2(2 * size - 1);
 
     for(int i = 0; i < log_size; i++){
         float val = 0;
@@ -53,7 +51,10 @@ __global__ void add_block_sums(float* m, float* sums, int size){
 void prefix_sum(float* m, float* n, int size){
     float* md;
     cudaMalloc((void**) &md, size * sizeof(float));
-    cudaMemcpy(md, m, size * sizeof(float), cudaMemcpyHostToDevice);
+    cudaMemset(md, 0, sizeof(float));
+    if (size > 1) {
+        cudaMemcpy(md + 1, m, (size - 1) * sizeof(float), cudaMemcpyHostToDevice);
+    }
 
     int block_size = 1024;
     int grid_size = (size + block_size - 1) / block_size;
