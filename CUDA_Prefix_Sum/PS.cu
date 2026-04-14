@@ -1,13 +1,14 @@
 #define log2(x) (31 - __builtin_clz(x))
 
 __global__ void prefix_sum_kernel(float* m, int size){
-    int iterations = log2(size);
     int idx = blockIdx.x * blockDim.x + threadIdx.x;
-    
-    for(int i = 0; i < iterations; i++){    
-        if(idx >= (1 << i)){
-            m[idx] += m[idx - (1 << i)];
+    int stride = 1;
+
+    for(int i = 0; i < log2(size); i++){
+        if(idx >= stride){
+            m[idx] += m[idx - stride];
         }
+        stride *= 2;
         __syncthreads();
     }
 }
